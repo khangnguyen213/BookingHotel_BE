@@ -25,7 +25,7 @@ app.use(
     // Allow requests from http://localhost:3000
     // origin: 'http://localhost:3000',
     origin: [
-      'https://booking-hotel-admin.vercel.app',
+      'https://booking-hotel-admin-yjyz.vercel.app',
       'https://booking-hotel-fe-pi.vercel.app',
     ],
     // Allow POST, PUT, GET, OPTIONS, and HEAD methods
