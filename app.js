@@ -18,6 +18,8 @@ const Transaction = require('./model/transaction');
 const userController = require('./controller/user');
 const hotelController = require('./controller/hotel');
 
+app.set('trust proxy', 1);
+
 app.use(
   cors({
     // Allow requests from http://localhost:3000
