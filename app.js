@@ -26,7 +26,7 @@ app.use(
     // origin: 'http://localhost:3000',
     origin: [
       'https://charitee-fe.vercel.app',
-      'https://booking-hotel-fe-virid.vercel.app',
+      'https://booking-hotel-fe-pi.vercel.app',
     ],
     // Allow POST, PUT, GET, OPTIONS, and HEAD methods
     methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD', 'DELETE'],
