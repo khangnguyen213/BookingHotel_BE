@@ -22,14 +22,10 @@ app.use(
   cors({
     // Allow requests from http://localhost:3000
     // origin: 'http://localhost:3000',
-    origin: [
-      'https://booking-hotel-fe-virid.vercel.app',
-      'https://charitee-fe.vercel.app',
-    ],
+    origin: ['https://booking-hotel-fe-virid.vercel.app'],
     // Allow POST, PUT, GET, OPTIONS, and HEAD methods
     methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD', 'DELETE'],
     // Allow credentials to be passed with requests
-    credentials: true,
   })
 );
 
