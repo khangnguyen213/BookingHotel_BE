@@ -1,19 +1,22 @@
-const express = require("express");
+const express = require('express');
 
-const cors = require("cors");
+const cors = require('cors');
 
 const app = express();
 
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
 
-const User = require("./model/user");
-const Hotel = require("./model/hotel");
-const Transaction = require("./model/transaction");
+const port = process.env.PORT || 5000;
+const mongodbURL = process.env.MONGO_API;
 
-const userController = require("./controller/user");
-const hotelController = require("./controller/hotel");
+const User = require('./model/user');
+const Hotel = require('./model/hotel');
+const Transaction = require('./model/transaction');
+
+const userController = require('./controller/user');
+const hotelController = require('./controller/hotel');
 
 app.use(cors());
 
@@ -22,26 +25,26 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 //GET USER LIST
-app.get("/user", userController.getUser);
+app.get('/user', userController.getUser);
 
 //LOGIN
-app.post("/login", userController.postLogin);
+app.post('/login', userController.postLogin);
 
 //REGISTER
-app.post("/register", userController.postRegister);
+app.post('/register', userController.postRegister);
 
 //GET OVERVIEW DATA
-app.get("/overview", hotelController.getOverview);
+app.get('/overview', hotelController.getOverview);
 
 //GET HOTEL LIST
-app.get("/hotel", (req, res, next) => {
+app.get('/hotel', (req, res, next) => {
   Hotel.find()
     .then((arr) => res.send(arr))
     .catch((err) => console.log(err));
 });
 
 //GET HOTEL BY ID
-app.get("/hotels/:hotelId", (req, res, next) => {
+app.get('/hotels/:hotelId', (req, res, next) => {
   Hotel.find({ _id: req.params.hotelId })
     .then((result) => res.send(result))
     .catch((err) => {
@@ -50,7 +53,7 @@ app.get("/hotels/:hotelId", (req, res, next) => {
 });
 
 //ADD HOTEL
-app.post("/add-hotel", userController.authenticateUser, (req, res, next) => {
+app.post('/add-hotel', userController.authenticateUser, (req, res, next) => {
   const hotelInformation = {
     name: req.body.name,
     title: req.body.title,
@@ -76,7 +79,7 @@ app.post("/add-hotel", userController.authenticateUser, (req, res, next) => {
 
 //DELETE HOTEL
 app.post(
-  "/delete-hotel",
+  '/delete-hotel',
   userController.authenticateUser,
   (req, res, next) => {
     if (!req.user.isAdmin) {
@@ -87,7 +90,7 @@ app.post(
       if (transactions.every((transaction) => transaction.dateEnd < today)) {
         next();
       } else {
-        return res.status(404).send("Hotel has already booked in near future");
+        return res.status(404).send('Hotel has already booked in near future');
       }
     });
   },
@@ -96,15 +99,15 @@ app.post(
       if (err) {
         console.log(err);
       } else {
-        console.log("Deleted : ", docs);
-        return res.send("Deleted Hotel");
+        console.log('Deleted : ', docs);
+        return res.send('Deleted Hotel');
       }
     });
   }
 );
 
 //ADD ROOM
-app.post("/add-room", userController.authenticateUser, (req, res, next) => {
+app.post('/add-room', userController.authenticateUser, (req, res, next) => {
   Hotel.findById(req.body.hotelId).then((hotel) => {
     const roomDetail = {
       desc: req.body.desc,
@@ -125,7 +128,7 @@ app.post("/add-room", userController.authenticateUser, (req, res, next) => {
 
 //DELETE ROOM
 app.post(
-  "/delete-room",
+  '/delete-room',
   userController.authenticateUser,
   (req, res, next) => {
     if (!req.user.isAdmin) {
@@ -146,7 +149,7 @@ app.post(
         } else {
           return res
             .status(404)
-            .send("Hotel has already booked in near future");
+            .send('Hotel has already booked in near future');
         }
       }
     });
@@ -166,13 +169,13 @@ app.post(
 
 //ADD TRANSACTION
 app.post(
-  "/add-transaction",
+  '/add-transaction',
   userController.authenticateUser,
   (req, res, next) => {
     Hotel.findById(req.body.hotelId)
       .then((hotel) => {
         if (!hotel) {
-          throw new Error("Hotel not found");
+          throw new Error('Hotel not found');
         }
         console.log(req.body);
         const transactionDetail = {
@@ -187,7 +190,7 @@ app.post(
 
         const transaction = new Transaction(transactionDetail);
         transaction.save().then((user) => {
-          user.populate("user", "hotel").then((user) => res.send(user));
+          user.populate('user', 'hotel').then((user) => res.send(user));
         });
       })
       .catch((err) => console.log(err.toString()));
@@ -195,17 +198,17 @@ app.post(
 );
 
 app.post(
-  "/all-transactions",
+  '/all-transactions',
   userController.authenticateUser,
   (req, res, next) => {
     console.log(req.user);
     if (!req.user.isAdmin) {
       return res
         .status(404)
-        .send("You need permission to access this database");
+        .send('You need permission to access this database');
     } else {
       Transaction.find()
-        .populate("hotel user")
+        .populate('hotel user')
         .then((transactions) => {
           console.log(transactions);
           return res.send(transactions);
@@ -216,11 +219,11 @@ app.post(
 );
 
 app.post(
-  "/find-transaction-by-user",
+  '/find-transaction-by-user',
   userController.authenticateUser,
   (req, res, next) => {
     Transaction.find({ user: req.user })
-      .populate("hotel")
+      .populate('hotel')
       .then((transactions) => {
         console.log(transactions);
         return res.send(transactions);
@@ -229,7 +232,7 @@ app.post(
   }
 );
 
-app.post("/search", async (req, res, next) => {
+app.post('/search', async (req, res, next) => {
   try {
     const destination = req.body.destination;
     const numberOfPeople =
@@ -316,7 +319,7 @@ app.post("/search", async (req, res, next) => {
   }
 });
 
-app.post("/check-hotel-available/:hotelId", async (req, res, next) => {
+app.post('/check-hotel-available/:hotelId', async (req, res, next) => {
   try {
     const startDate = new Date(req.body.date[0].startDate);
     const endDate = new Date(req.body.date[0].endDate);
@@ -359,11 +362,9 @@ app.post("/check-hotel-available/:hotelId", async (req, res, next) => {
 });
 
 mongoose
-  .connect(
-    "mongodb+srv://khangnguyen:140202@cluster0.btdla2l.mongodb.net/booking?retryWrites=true&w=majority"
-  )
+  .connect(mongodbURL)
   .then((result) => {
-    app.listen(5000);
+    app.listen(port);
   })
   .catch((err) => {
     console.log(err);
